@@ -1,0 +1,4 @@
+.vscode/
+.git/
+*.py[co]
+*_env/

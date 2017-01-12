@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+
+import json
+import tempfile
+import time
+import sys
+import hashlib
+
+
+def main():
+    data = _get_data()
+    versions = [{'ref': _generate_version_hash()}]
+
+    if data['version']:
+        versions.append(data['version'])
+
+    print(json.dumps(versions))
+
+
+def _get_data():
+    json_data = sys.stdin.read()
+
+    with tempfile.NamedTemporaryFile(delete=False, prefix='check-') as f:
+        f.write(bytes(json_data, 'utf-8'))
+
+    data = json.loads(json_data)
+    return data
+
+
+def _generate_version_hash():
+    time_str = '%s' % time.time()
+    hash_object = hashlib.md5(time_str.encode())
+    hash_str = hash_object.hexdigest()
+
+    return hash_str[:6]
+
+if __name__ == '__main__':
+    main()

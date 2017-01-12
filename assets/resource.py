@@ -9,7 +9,7 @@ import tempfile
 import requests
 
 
-class HTTPResource:
+class HTTPResource(object):
     """HTTP resource implementation."""
 
     def cmd(self, arg, data):
@@ -87,7 +87,11 @@ class HTTPResource:
         if os.environ.get('TEST', False):
             response.update(json.loads(text))
 
-        return json.dumps(response)
+
+        payload = json.dumps(response)
+        log.debug('payload: %s', payload)
+
+        return payload
 
     def _interpolate(self, data, values):
         """Recursively apply values using format on all string key and values in data."""
@@ -105,4 +109,6 @@ class HTTPResource:
 
         return rendered
 
-print(HTTPResource().run(os.path.basename(__file__), sys.stdin.read(), sys.argv[1:]))
+
+if __name__ == '__main__':
+    print(HTTPResource().run(os.path.basename(__file__), sys.stdin.read(), sys.argv[1:]))
