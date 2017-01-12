@@ -68,3 +68,39 @@ def test_data_urlencode(httpbin):
     output = cmd('out', source)
 
     assert output['form'] == {'field': '{"test": 123}'}
+
+def test_check(httpbin):
+    """Json should be passed as JSON content."""
+
+    source = {
+        'uri': httpbin + '/post',
+        'method': 'POST',
+        'json': {
+            'test': 123,
+        },
+    }
+
+    output = cmd('check', source, version={'ref': '123'})
+
+    ref_0 = output[0]
+    ref_1 = output[1]
+
+    print(output)
+
+    assert ref_0.get('ref') != '123'
+    assert ref_1.get('ref') == '123'
+
+def test_json_in(httpbin):
+    """Json should be passed as JSON content."""
+
+    source = {
+        'uri': httpbin + '/post',
+        'method': 'POST',
+        'json': {
+            'test': 987,
+        },
+    }
+
+    output = cmd('in', source, args=['/tmp'])
+
+    assert output['json']['test'] == 987
