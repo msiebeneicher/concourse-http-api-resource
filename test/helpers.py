@@ -26,11 +26,4 @@ def cmd(cmd_name, source, args: list = [], version={}, params={}):
     output = subprocess.check_output(command, env=environment,
         stderr=sys.stderr, input=bytes(in_json, 'utf-8'))
 
-    if cmd_name == 'in':
-        file_name = '%s/response.json' % args[0]
-        with open(file_name) as data_file:
-            json_data = json.load(data_file)
-    else:
-        json_data = json.loads(output.decode())
-
-    return json_data
+    return json.loads(output.decode())

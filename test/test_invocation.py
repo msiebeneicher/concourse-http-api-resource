@@ -85,10 +85,10 @@ def test_check(httpbin):
     ref_0 = output[0]
     ref_1 = output[1]
 
-    print(output)
+    assert ref_0.get('ref') == '123'
 
-    assert ref_0.get('ref') != '123'
-    assert ref_1.get('ref') == '123'
+    assert ref_1.get('ref') != ''
+    assert ref_1.get('ref') != '123'
 
 def test_json_in(httpbin):
     """Json should be passed as JSON content."""
@@ -101,6 +101,13 @@ def test_json_in(httpbin):
         },
     }
 
-    output = cmd('in', source, args=['/tmp'])
+    output = cmd('in', source, args=['/tmp'], version={'ref': '123'})
 
-    assert output['json']['test'] == 987
+    assert output['version']['ref'] == '123'
+    for meta_object in output['metadata']:
+        if meta_object.get('name') == 'http_response_code':
+            assert meta_object.get('value') == '200'
+
+    with open('/tmp/response.json') as data_file:
+        json_data = json.load(data_file)
+        assert json_data['json']['test'] == 987

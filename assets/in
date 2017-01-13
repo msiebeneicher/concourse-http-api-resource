@@ -1,44 +1,43 @@
 #!/usr/bin/env python3
 
-import hashlib
 import json
 import os
 import sys
 import time
 
-from resource import HTTPResource
+from resource import HTTPResource, generate_version_hash
 
 
 def main():
     """main function for `in` command """
-    response = HTTPResource().run(os.path.basename(__file__), sys.stdin.read(), sys.argv[1:])
-    _save_response(response, sys.argv[1])
+    http_resource = HTTPResource(os.path.basename(__file__), sys.stdin.read())
+
+    response = http_resource.run(sys.argv[1:])
+    _save_response(http_resource.http_response_payload, sys.argv[1])
+
+    version = http_resource.input_data.get('version')
+    if not version.get('ref') or version.get('ref') == '':
+        version = {"ref": generate_version_hash()}
 
     response_dict = {
-      "version": {"ref": _generate_version_hash()},
+      "version": version,
       "metadata": [
-        { "name": "payload", "value": response[:100] },
+        {"name": "time", "value": str(time.time())},
+        {"name": "http_response_code", "value": str(http_resource.http_response_code)},
+        {"name": "http_response_payload", "value": '%s [...]' % http_resource.http_response_payload[:100]},
       ]
     }
 
     print (json.dumps(response_dict))
 
 
-def _save_response(json_data, file_path):
+def _save_response(response_data, file_path):
     """save json content as file """
     file_name = '%s/response.json' % os.path.abspath(file_path)
 
     fo = open(file_name, "wb")
-    fo.write(bytes(json_data, 'utf-8'))
+    fo.write(bytes(response_data, 'utf-8'))
     fo.close()
-
-
-def _generate_version_hash():
-    time_str = '%s' % time.time()
-    hash_object = hashlib.md5(time_str.encode())
-    hash_str = hash_object.hexdigest()
-
-    return hash_str[:6]
 
 if __name__ == '__main__':
     main()

@@ -2,17 +2,19 @@
 
 import json
 import tempfile
-import time
 import sys
-import hashlib
+
+from resource import generate_version_hash
 
 
 def main():
     data = _get_data()
-    versions = [{'ref': _generate_version_hash()}]
+    versions = []
 
     if data['version']:
         versions.append(data['version'])
+
+    versions.append({'ref': generate_version_hash()})
 
     print(json.dumps(versions))
 
@@ -26,13 +28,6 @@ def _get_data():
     data = json.loads(json_data)
     return data
 
-
-def _generate_version_hash():
-    time_str = '%s' % time.time()
-    hash_object = hashlib.md5(time_str.encode())
-    hash_str = hash_object.hexdigest()
-
-    return hash_str[:6]
 
 if __name__ == '__main__':
     main()
