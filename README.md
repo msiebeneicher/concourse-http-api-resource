@@ -58,6 +58,7 @@ Also shows how the usage of a authentication header using Concourse variables.
 resources:
     - name: hipchat
       type: http-api
+      check_every: 1h
       source:
           uri: https://www.hipchat.com/v2/room/team_room/notification
           method: POST
@@ -96,6 +97,7 @@ More info: https://wiki.jenkins-ci.org/display/JENKINS/Remote+access+API#Remotea
 resources:
     - name: jenkins-trigger-job
       type: http-api
+      check_every: 1h
       source:
           uri: http://user:token@jenkins.example.com/job/job_name/build
           method: POST
